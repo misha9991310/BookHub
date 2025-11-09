@@ -21,7 +21,7 @@ class Review(BaseModel):
         verbose_name='Пользователь'
     )
     rating = models.PositiveSmallIntegerField(
-        'Оценка',
+        verbose_name='Оценка',
         validators=[
             MinValueValidator(1, message='Оценка не может быть меньше 1'),
             MaxValueValidator(5, message='Оценка не может быть больше 5')
@@ -29,7 +29,7 @@ class Review(BaseModel):
         help_text='Оценка от 1 до 5 звезд'
     )
     text = models.TextField(
-        'Текст отзыва',
+        verbose_name='Текст отзыва',
         max_length=2000,
         blank=True,
         null=True,

@@ -8,8 +8,6 @@ from book_hub.books.models import Book, Genre, ReadingList
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    model = Book
-
     list_display = ['title', 'owner', 'author', 'cover_image', 'description', 'year_published', 'status', 'isbn',]
     search_fields = ['title', 'author', 'genres',]
 
@@ -17,15 +15,11 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    model = Genre
-
     list_display = ['title', 'slug',]
     search_fields = ['title',]
 
 
 @admin.register(ReadingList)
 class ReadingListAdmin(admin.ModelAdmin):
-    model = ReadingList
-
     list_display = ['user', 'book', 'type', 'added_date',]
     search_fields = ['user',]

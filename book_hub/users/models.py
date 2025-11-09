@@ -6,6 +6,7 @@ from book_hub.common.models import BaseModel
 
 
 class User(BaseModel, AbstractUser):
+    # uuid4 - pk
     bio = models.TextField(verbose_name="Биография")
     avatar = models.ImageField(upload_to='avatars/%Y/%m/%d/', null=True, blank=True, verbose_name="Аватар")
     favorite_genres = models.ManyToManyField(
@@ -18,6 +19,8 @@ class User(BaseModel, AbstractUser):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+
+        # ordering
 
     def __str__(self):
         return self.username

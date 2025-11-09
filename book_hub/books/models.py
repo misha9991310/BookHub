@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
@@ -41,16 +42,15 @@ class Book(BaseModel):
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
     year_published = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Год издания")
     slug = models.SlugField(max_length=200, unique=True)
-    genres = models.ManyToManyField(Genre, max_length=100, verbose_name="Жанры", related_name='books')
+    genres = models.ManyToManyField(Genre, verbose_name="Жанры", related_name='books')
     status = models.CharField(
-        max_length=64,
+        max_length=64,  # max([len(value) for value in BookStatus.values])
         choices=BookStatus.choices,
         default=BookStatus.AVAILABLE,
         verbose_name="Статус книги"
     )
-    isbn = models.CharField(null=True, blank=True, verbose_name='ISBN', max_length=13,
+    isbn = models.CharField(null=True, blank=True, verbose_name='ISBN', max_length=13, # min_length
                             help_text='13-digit ISBN number', unique=True)
-
 
     def __str__(self):
         return self.title
@@ -65,8 +65,6 @@ class Book(BaseModel):
 
 
 class ReadingList(models.Model):
-
-
     user = models.ForeignKey(
         'users.User',
         on_delete=models.CASCADE,
@@ -79,12 +77,12 @@ class ReadingList(models.Model):
         related_name='reading_lists',
         verbose_name='Книга'
     )
-    type = models.CharField(
-        max_length=20,
+    type = models.CharField( # list_type
+        max_length=20,  # max([len(value) for value in ReadingListType.values])
         choices=ReadingListType.choices,
         verbose_name='Тип списка',
     )
-    added_date = models.DateTimeField('Дата добавления', auto_now_add=True)
+    added_date = models.DateTimeField('Дата добавления', auto_now_add=True)  # created_at из basemodel 
 
     class Meta:
         verbose_name = 'Список чтения'
@@ -95,14 +93,11 @@ class ReadingList(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.book.title}"
 
-
     def clean(self):
-        from django.core.exceptions import ValidationError
-
-        if ReadingList.objects.filter(
-                user=self.user,
-                book=self.book,
-                type=self.type
+        if ReadingList.objects.filter(  #  unique_together достаточно
+            user=self.user,
+            book=self.book,
+            type=self.type
         ).exclude(pk=self.pk).exists():
             raise ValidationError(
                 f'Книга "{self.book.title}" уже находится в списке "{self.type}"'
