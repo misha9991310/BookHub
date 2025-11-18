@@ -3,7 +3,6 @@ from django.contrib import admin
 from book_hub.reviews.models import Review, ReviewLike
 
 
-
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = (

@@ -64,7 +64,6 @@ class Book(BaseModel):
         unique=True,
     )
 
-
     class Meta:
         verbose_name = "Книга"
         verbose_name_plural = "Книги"

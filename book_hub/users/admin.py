@@ -28,6 +28,9 @@ class UserAdmin(DefaultUserAdmin):
         "avatar",
     )
     search_fields = ("username", "email", "first_name", "last_name")
-    list_filter = ("is_active", 'is_admin',)
+    list_filter = (
+        "is_active",
+        "is_admin",
+    )
     ordering = ("-created_at",)
     inlines = [ReadingListInline]
