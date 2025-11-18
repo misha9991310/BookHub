@@ -8,19 +8,26 @@ from book_hub.users.models import User
 class ReadingListInline(admin.TabularInline):
     model = ReadingList
     extra = 1
-    fields = ('book', 'type', 'added_date')
-    readonly_fields = ('added_date',)
+    fields = ("book", "list_type", "created_at")
+    readonly_fields = ("created_at",)
 
 
 @admin.register(User)
 class UserAdmin(DefaultUserAdmin):
-    model = User
     fieldsets = DefaultUserAdmin.fieldsets + (
-        (None, {'fields': ('bio', 'avatar', 'favorite_genres')}),
+        (None, {"fields": ("bio", "avatar", "favorite_genres")}),
     )
 
-    list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'bio', 'avatar']
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    # list_filter = (...)
-    ordering = ('-created_at',)
+    list_display = (
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "bio",
+        "avatar",
+    )
+    search_fields = ("username", "email", "first_name", "last_name")
+    list_filter = ("is_active", 'is_admin',)
+    ordering = ("-created_at",)
     inlines = [ReadingListInline]
