@@ -1,6 +1,16 @@
 from rest_framework import serializers
+
+from book_hub.books.models import Genre
 from book_hub.users.models import User
-from book_hub.api.v1.genres.serializers import GenreOutputSerializer
+
+
+class GenreOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = (
+            "title",
+        )
+
 
 
 class UserMinimalOutputSerializer(serializers.ModelSerializer):

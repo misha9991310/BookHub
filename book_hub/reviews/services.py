@@ -7,26 +7,19 @@ from book_hub.reviews.models import Review, ReviewLike
 
 
 class ReviewsService:
-    @transaction.atomic
     def review_create(self, **fields) -> Review:
-        review = Review.objects.create(**fields)
+        return Review.objects.create(**fields)
 
-        return review
-
-    @transaction.atomic
-    def review_update(self, review: Review, **fields) -> Review:
-        for attr, value in fields.items():
+    def review_update(self, review: Review, **fields) -> Review:  # добавить dto
+        for attr, value in fields.items():  # как сделать апдейт на None 
             setattr(review, attr, value)
         review.save()
 
         return review
 
-    @transaction.atomic
     def create_review_like(self, review_pk: int, user_id: UUID) -> ReviewLike:
         try:
-            like = ReviewLike.objects.create(review_pk=review_pk, user_id=user_id)
-            return like
-
+            return ReviewLike.objects.create(review_pk=review_pk, user_id=user_id)
         except IntegrityError:
             raise ValidationError("Вы уже лайкали этот отзыв")
 

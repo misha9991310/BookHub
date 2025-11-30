@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from book_hub.reviews.models import Review
+
 from book_hub.api.v1.books.serializers import BookListOutputSerializer
 from book_hub.api.v1.users.serializers import UserMinimalOutputSerializer
+from book_hub.reviews.models import Review
 
 
 class ReviewOutputSerializer(serializers.ModelSerializer):
@@ -29,14 +30,13 @@ class ReviewOutputSerializer(serializers.ModelSerializer):
         return obj.likes.count()
 
     def get_has_liked(self, obj) -> bool:
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request and request.user.is_authenticated:
             return obj.likes.filter(user=request.user).exists()
         return False
 
 
 class ReviewInputSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Review
         fields = [
@@ -46,12 +46,10 @@ class ReviewInputSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        request = self.context.get('request')
-        book = attrs.get('book')
+        request = self.context.get("request")
+        book = attrs.get("book")
 
         if request and book:
             if Review.objects.filter(book=book, user=request.user).exists():
-                raise serializers.ValidationError(
-                    "Вы уже оставляли отзыв на эту книгу"
-                )
+                raise serializers.ValidationError("Вы уже оставляли отзыв на эту книгу")
         return attrs

@@ -103,7 +103,7 @@ class ReadingList(BaseModel):
     class Meta:
         verbose_name = "Список чтения"
         verbose_name_plural = "Списки чтения"
-        unique_together = ["user", "book", "list_type"]
+        unique_together = ["user", "book"]
         ordering = ["-created_at"]
 
     def __str__(self):

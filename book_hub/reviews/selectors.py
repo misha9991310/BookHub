@@ -1,6 +1,5 @@
 from django.db.models import QuerySet
 
-from book_hub.books.models import Book
 from book_hub.reviews.models import Review
 
 
@@ -14,12 +13,10 @@ class ReviewsSelector:
 
     @classmethod
     def reviews_by_book(cls, book_pk: int) -> QuerySet[Review]:
-        return Review.objects.filter(book_id=book_pk).select_related(
-            'user'
-        ).prefetch_related('likes')
+        return (
+            Review.objects.filter(book_id=book_pk).select_related("user").prefetch_related("likes")
+        )
 
     @classmethod
     def reviews_by_user(cls, user_id: int) -> QuerySet[Review]:
-        return Review.objects.filter(user_id=user_id).select_related('book')
-
-
+        return Review.objects.filter(user_id=user_id).select_related("book")

@@ -1,7 +1,16 @@
 from rest_framework import serializers
-from book_hub.books.models import Book, ReadingList, Genre
-from book_hub.api.v1.genres.serializers import GenreOutputSerializer
+
 from book_hub.api.v1.users.serializers import UserMinimalOutputSerializer
+from book_hub.books.models import Book, Genre, ReadingList
+
+
+class GenreOutputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = [
+            "title",
+            "slug",
+        ]
 
 
 class BookListOutputSerializer(serializers.ModelSerializer):
@@ -17,7 +26,7 @@ class BookListOutputSerializer(serializers.ModelSerializer):
             "year_published",
             "genres",
             "status",
-            "slug"
+            "slug",
         ]
         read_only_fields = fields
 
@@ -48,9 +57,7 @@ class BookDetailOutputSerializer(serializers.ModelSerializer):
 
 class BookInputSerializer(serializers.ModelSerializer):
     genres = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Genre.objects.all(),
-        required=False
+        many=True, queryset=Genre.objects.all(), required=False
     )
 
     class Meta:
@@ -84,7 +91,6 @@ class ReadingListOutputSerializer(serializers.ModelSerializer):
 
 
 class ReadingListInputSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ReadingList
         fields = [
