@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from typing import Any
 
 import environ
 
@@ -49,6 +50,7 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     # 'storages',
     "rest_framework",
+    "drf_spectacular",
 ]
 
 INSTALLED_APPS = [
@@ -163,3 +165,14 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
+
+REST_FRAMEWORK: dict[str, Any] = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'BOOK HUB',
+    'DESCRIPTION': 'pet-project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

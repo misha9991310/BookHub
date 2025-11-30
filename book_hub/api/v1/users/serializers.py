@@ -1,0 +1,37 @@
+from rest_framework import serializers
+from book_hub.users.models import User
+from book_hub.api.v1.genres.serializers import GenreOutputSerializer
+
+
+class UserMinimalOutputSerializer(serializers.ModelSerializer):
+    favorite_genres = GenreOutputSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "avatar",
+            "favorite_genres",
+        ]
+        read_only_fields = fields
+
+
+class UserDetailOutputSerializer(serializers.ModelSerializer):
+    favorite_genres = GenreOutputSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "avatar",
+            "favorite_genres",
+            "date_joined",
+            "created_at",
+        ]
+        read_only_fields = fields
