@@ -7,10 +7,7 @@ from book_hub.users.models import User
 class GenreOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = (
-            "title",
-        )
-
+        fields = ("title",)
 
 
 class UserMinimalOutputSerializer(serializers.ModelSerializer):

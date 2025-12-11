@@ -2,6 +2,7 @@ from collections.abc import Iterable
 
 from django.db import transaction
 
+from book_hub.books.entities import CreateBook, UpdateBook, NOT_SET
 from book_hub.books.models import Book, Genre, ReadingList
 from book_hub.users.models import User
 
@@ -10,30 +11,44 @@ class BookService:
     @staticmethod
     def _set_genres(book: Book, genres_ids: Iterable[int] | None) -> None:
         if genres_ids:
-            genre_ids = [int(g) for g in genres_ids]
-            book.genres.set(Genre.objects.filter(id__in=genre_ids))
+            book.genres.set(genres_ids)
 
     @transaction.atomic
-    def book_create(self, owner: User, **fields) -> Book:
-        genres_ids = fields.pop("genres", [])
-        book = Book.objects.create(owner=owner, **fields)
+    def book_create(self, owner: User, create_data: CreateBook) -> Book:
+        genres_ids = create_data.genres
+        book = Book.objects.create(
+            owner=owner,
+            title=create_data.title,
+            author=create_data.author,
+            cover_image=create_data.cover_image,
+            description=create_data.description,
+            year_published=create_data.year_published,
+            status=create_data.status,
+            isbn=create_data.isbn,
+        )
 
         self._set_genres(book=book, genres_ids=genres_ids)
 
         return book
 
     @transaction.atomic
-    def book_update(self, book: Book, **fields) -> Book:
-        genres = fields.pop("genres", [])
+    def book_update(self, book: Book, update_data: UpdateBook) -> Book:
+        update_fields = []
 
-        for attr, value in fields.items():
-            setattr(book, attr, value)
-        book.save()
+        for field_name in [
+            "title", "author", "description",
+            "year_published", "status", "isbn", "cover_image"
+        ]:
+            value = getattr(update_data, field_name, None)
+            if value is not NOT_SET:
+                setattr(book, field_name, value)
+                update_fields.append(field_name)
 
-        if genres:  # метод использовать
-            genre_ids = [int(g) for g in genres]
-            genre_objects = Genre.objects.filter(id__in=genre_ids)
-            book.genres.set(genre_objects)
+        if update_data.genres is not NOT_SET:
+         self._set_genres(book, update_data.genres)
+
+        if update_fields:
+            book.save(update_fields=update_fields)
 
         return book
 

@@ -2,7 +2,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
-from book_hub.books.enums import BookStatus, ReadingListType
+from book_hub.books.entities import BookStatus, ReadingListType
 from book_hub.common.models import BaseModel
 
 

@@ -4,7 +4,7 @@ from book_hub.api.v1.users.serializers import UserMinimalOutputSerializer
 from book_hub.books.models import Book, Genre, ReadingList
 
 
-class GenreOutputSerializer(serializers.ModelSerializer):
+class GenreOutputForBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = [
@@ -14,7 +14,7 @@ class GenreOutputSerializer(serializers.ModelSerializer):
 
 
 class BookListOutputSerializer(serializers.ModelSerializer):
-    genres = GenreOutputSerializer(many=True, read_only=True)
+    genres = GenreOutputForBookSerializer(many=True, read_only=True)
 
     class Meta:
         model = Book
@@ -32,7 +32,7 @@ class BookListOutputSerializer(serializers.ModelSerializer):
 
 
 class BookDetailOutputSerializer(serializers.ModelSerializer):
-    genres = GenreOutputSerializer(many=True, read_only=True)
+    genres = GenreOutputForBookSerializer(many=True, read_only=True)
     owner = UserMinimalOutputSerializer(read_only=True)
 
     class Meta:
@@ -97,3 +97,33 @@ class ReadingListInputSerializer(serializers.ModelSerializer):
             "book",
             "list_type",
         ]
+
+
+class UpdateBookInputSerializer(serializers.ModelSerializer):
+    genres = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    class Meta:
+        model = Book
+        fields = [
+            "title",
+            "author",
+            "cover_image",
+            "description",
+            "year_published",
+            "genres",
+            "status",
+            "isbn",
+        ]
+        extra_kwargs = {
+            'title': {'required': False},
+            'author': {'required': False},
+            'cover_image': {'required': False},
+            'description': {'required': False},
+            'year_published': {'required': False},
+            'status': {'required': False},
+            'isbn': {'required': False},
+        }

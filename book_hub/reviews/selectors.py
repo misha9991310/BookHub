@@ -7,16 +7,16 @@ class ReviewsSelector:
     def __init__(self, review: Review | None = None) -> None:
         self._review = review
 
-    @classmethod
-    def review_list(cls) -> QuerySet[Review]:
+    @staticmethod
+    def review_list() -> QuerySet[Review]:
         return Review.objects.all()
 
-    @classmethod
-    def reviews_by_book(cls, book_pk: int) -> QuerySet[Review]:
+    @staticmethod
+    def reviews_by_book(book_pk: int) -> QuerySet[Review]:
         return (
             Review.objects.filter(book_id=book_pk).select_related("user").prefetch_related("likes")
         )
 
-    @classmethod
-    def reviews_by_user(cls, user_id: int) -> QuerySet[Review]:
+    @staticmethod
+    def reviews_by_user(user_id: int) -> QuerySet[Review]:
         return Review.objects.filter(user_id=user_id).select_related("book")
