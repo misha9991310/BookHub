@@ -1,9 +1,10 @@
 from django.urls import path
 
 from book_hub.api.v1.books.apis import (
-    BookApi, BookListAndCreateApi, ReadingListAddBookApi,
+    BookApi,
+    BookListAndCreateApi,
+    ReadingListAddBookApi,
 )
-
 
 urlpatterns = [
     path("", BookListAndCreateApi.as_view(), name="book-list-create"),

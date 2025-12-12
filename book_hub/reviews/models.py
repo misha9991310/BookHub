@@ -7,9 +7,7 @@ from book_hub.users.models import User
 
 
 class Review(BaseModel):
-    book = models.ForeignKey(
-        Book, on_delete=models.CASCADE, related_name="reviews", verbose_name="Книга"
-    )
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reviews", verbose_name="Книга")
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -43,9 +41,7 @@ class Review(BaseModel):
 
 
 class ReviewLike(BaseModel):
-    review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name="likes", verbose_name="Отзыв"
-    )
+    review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name="likes", verbose_name="Отзыв")
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

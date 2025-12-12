@@ -2,8 +2,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from django.db import models
-from uuid import UUID
-
 from django.db.models.fields.files import ImageFieldFile
 
 
@@ -12,12 +10,15 @@ class BookStatus(models.TextChoices):
     READS = "READS"
     IN_ARCHIVE = "IN_ARCHIVE"
 
+
 class ReadingListType(models.TextChoices):
     WANT_TO_READ = "WANT_TO_READ"
     READING = "READING"
     READ = "READ"
 
+
 NOT_SET = object()
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class CreateBook:
@@ -29,6 +30,7 @@ class CreateBook:
     genres: list[int]
     status: str
     isbn: str | None
+
 
 @dataclass(frozen=True, kw_only=True, slots=True)
 class UpdateBook:

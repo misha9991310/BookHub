@@ -44,9 +44,7 @@ class Book(BaseModel):
         verbose_name="Изображение обложки",
     )
     description = models.TextField(blank=True, null=True, verbose_name="Описание")
-    year_published = models.PositiveSmallIntegerField(
-        null=True, blank=True, verbose_name="Год издания"
-    )
+    year_published = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Год издания")
     slug = models.SlugField(max_length=200, unique=True)
     genres = models.ManyToManyField(Genre, verbose_name="Жанры", related_name="books")
     status = models.CharField(

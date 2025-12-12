@@ -2,8 +2,8 @@ from collections.abc import Iterable
 
 from django.db import transaction
 
-from book_hub.books.entities import CreateBook, UpdateBook, NOT_SET
-from book_hub.books.models import Book, Genre, ReadingList
+from book_hub.books.entities import NOT_SET, CreateBook, UpdateBook
+from book_hub.books.models import Book, ReadingList
 from book_hub.users.models import User
 
 
@@ -36,8 +36,13 @@ class BookService:
         update_fields = []
 
         for field_name in [
-            "title", "author", "description",
-            "year_published", "status", "isbn", "cover_image"
+            "title",
+            "author",
+            "description",
+            "year_published",
+            "status",
+            "isbn",
+            "cover_image",
         ]:
             value = getattr(update_data, field_name, None)
             if value is not NOT_SET:
@@ -45,7 +50,7 @@ class BookService:
                 update_fields.append(field_name)
 
         if update_data.genres is not NOT_SET:
-         self._set_genres(book, update_data.genres)
+            self._set_genres(book, update_data.genres)
 
         if update_fields:
             book.save(update_fields=update_fields)
@@ -56,6 +61,4 @@ class BookService:
         book.delete()
 
     def reading_list_add(self, user: User, book: Book, list_type: str) -> ReadingList:
-        return ReadingList.objects.get_or_create(
-            user=user, book=book, defaults={"list_type": list_type}
-        )[0]
+        return ReadingList.objects.get_or_create(user=user, book=book, defaults={"list_type": list_type})[0]

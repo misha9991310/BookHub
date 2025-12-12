@@ -54,6 +54,7 @@ class ReviewInputSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Вы уже оставляли отзыв на эту книгу")
         return attrs
 
+
 class ReviewOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review

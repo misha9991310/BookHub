@@ -15,10 +15,11 @@ from book_hub.api.v1.books.serializers import (
 from book_hub.api.v1.users.serializers import (
     CustomTokenObtainPairSerializer,
     RegistrationSerializer,
-    UserProfileSerializer,
+    UserProfileOutputSerializer,
 )
 from book_hub.books.selectors import BookSelector
 from book_hub.users.entities import CreateUser
+from book_hub.users.selectors import UserSelector
 from book_hub.users.services import UserService
 
 
@@ -29,7 +30,7 @@ class UserRegistrationAPI(APIView):
     @extend_schema(
         summary="Регистрация пользователя",
         request=RegistrationSerializer,
-        responses=UserProfileSerializer(many=True),
+        responses=UserProfileOutputSerializer(many=True),
     )
     def post(self, request: Request) -> Response:
         serializer = RegistrationSerializer(data=request.data)
@@ -46,7 +47,7 @@ class UserRegistrationAPI(APIView):
             )
         )
         refresh = RefreshToken.for_user(user)
-        user_serializer = UserProfileSerializer(user)
+        user_serializer = UserProfileOutputSerializer(user)
         return Response(
             {
                 "user": user_serializer,
@@ -68,9 +69,7 @@ class LogoutView(APIView):
             token = RefreshToken(refresh_token)
             token.blacklist()
 
-            return Response(
-                {"message": "Успешный выход из системы"}, status=status.HTTP_205_RESET_CONTENT
-            )
+            return Response({"message": "Успешный выход из системы"}, status=status.HTTP_205_RESET_CONTENT)
         except TokenError:
             return Response({"error": "Неверный токен"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -92,10 +91,14 @@ class UserListBookApi(APIView):
 
 
 class UserProfileView(APIView):
-    serializer_class = UserProfileSerializer
+    serializer_class = UserProfileOutputSerializer
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Получить профиль пользователя",
+        responses=UserProfileOutputSerializer(many=True),
+    )
     def get(self, request: Request) -> Response:
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        user = UserSelector.user_by_id(user=request.user)
+        serializer = UserProfileOutputSerializer(user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

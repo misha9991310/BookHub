@@ -13,4 +13,3 @@ class UpdateReview:
     book: int
     rating: int
     text: str | None
-

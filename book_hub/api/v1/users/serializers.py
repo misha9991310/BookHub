@@ -20,7 +20,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ["username", "email", "bio", "avatarfavorite_genrespassword"]
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserProfileOutputSerializer(serializers.ModelSerializer):
     favorite_genres = GenreOutputSerializer(many=True, read_only=True)
 
     class Meta:
@@ -56,7 +56,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
 
-        serializer = UserProfileSerializer(self.user)
+        serializer = UserProfileOutputSerializer(self.user)
         data["user"] = serializer.data
 
         return data

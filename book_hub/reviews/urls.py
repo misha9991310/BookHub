@@ -1,7 +1,8 @@
 from django.urls import path
 
 from book_hub.api.v1.review.apis import (
-    ReviewCreateApi, ReviewApi,
+    ReviewApi,
+    ReviewCreateApi,
 )
 
 urlpatterns = [

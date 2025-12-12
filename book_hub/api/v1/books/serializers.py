@@ -56,9 +56,7 @@ class BookDetailOutputSerializer(serializers.ModelSerializer):
 
 
 class BookInputSerializer(serializers.ModelSerializer):
-    genres = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Genre.objects.all(), required=False
-    )
+    genres = serializers.PrimaryKeyRelatedField(many=True, queryset=Genre.objects.all(), required=False)
 
     class Meta:
         model = Book
@@ -101,11 +99,9 @@ class ReadingListInputSerializer(serializers.ModelSerializer):
 
 class UpdateBookInputSerializer(serializers.ModelSerializer):
     genres = serializers.PrimaryKeyRelatedField(
-        many=True,
-        queryset=Genre.objects.all(),
-        required=False,
-        allow_null=True
+        many=True, queryset=Genre.objects.all(), required=False, allow_null=True
     )
+
     class Meta:
         model = Book
         fields = [
@@ -119,11 +115,11 @@ class UpdateBookInputSerializer(serializers.ModelSerializer):
             "isbn",
         ]
         extra_kwargs = {
-            'title': {'required': False},
-            'author': {'required': False},
-            'cover_image': {'required': False},
-            'description': {'required': False},
-            'year_published': {'required': False},
-            'status': {'required': False},
-            'isbn': {'required': False},
+            "title": {"required": False},
+            "author": {"required": False},
+            "cover_image": {"required": False},
+            "description": {"required": False},
+            "year_published": {"required": False},
+            "status": {"required": False},
+            "isbn": {"required": False},
         }

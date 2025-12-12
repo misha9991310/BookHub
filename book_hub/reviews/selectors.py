@@ -13,9 +13,7 @@ class ReviewsSelector:
 
     @staticmethod
     def reviews_by_book(book_pk: int) -> QuerySet[Review]:
-        return (
-            Review.objects.filter(book_id=book_pk).select_related("user").prefetch_related("likes")
-        )
+        return Review.objects.filter(book_id=book_pk).select_related("user").prefetch_related("likes")
 
     @staticmethod
     def reviews_by_user(user_id: int) -> QuerySet[Review]:

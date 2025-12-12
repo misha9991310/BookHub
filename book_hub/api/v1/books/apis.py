@@ -7,9 +7,12 @@ from rest_framework.views import APIView
 from book_hub.api.v1.books.serializers import (
     BookDetailOutputSerializer,
     BookInputSerializer,
-    BookListOutputSerializer, UpdateBookInputSerializer, ReadingListInputSerializer, ReadingListOutputSerializer,
+    BookListOutputSerializer,
+    ReadingListInputSerializer,
+    ReadingListOutputSerializer,
+    UpdateBookInputSerializer,
 )
-from book_hub.books.entities import CreateBook, UpdateBook, NOT_SET
+from book_hub.books.entities import NOT_SET, CreateBook, UpdateBook
 from book_hub.books.selectors import BookSelector
 from book_hub.books.services import BookService
 
@@ -35,7 +38,7 @@ class BookListAndCreateApi(APIView):
                 genres=serializer.validated_data["genres"],
                 status=serializer.validated_data["status"],
                 isbn=serializer.validated_data["isbn"],
-            )
+            ),
         )
         output_serializer = BookDetailOutputSerializer(book)
 
@@ -86,15 +89,15 @@ class BookApi(APIView):
         updated_book = BookService().book_update(
             book=book,
             update_data=UpdateBook(
-                title=serializer.validated_data.get('title', NOT_SET),
-                author=serializer.validated_data.get('author', NOT_SET),
-                cover_image=serializer.validated_data.get('cover_image', NOT_SET),
-                description=serializer.validated_data.get('description', NOT_SET),
-                year_published=serializer.validated_data.get('year_published', NOT_SET),
-                genres=serializer.validated_data.get('genres', NOT_SET),
-                status=serializer.validated_data.get('status', NOT_SET),
-                isbn=serializer.validated_data.get('isbn', NOT_SET),
-            )
+                title=serializer.validated_data.get("title", NOT_SET),
+                author=serializer.validated_data.get("author", NOT_SET),
+                cover_image=serializer.validated_data.get("cover_image", NOT_SET),
+                description=serializer.validated_data.get("description", NOT_SET),
+                year_published=serializer.validated_data.get("year_published", NOT_SET),
+                genres=serializer.validated_data.get("genres", NOT_SET),
+                status=serializer.validated_data.get("status", NOT_SET),
+                isbn=serializer.validated_data.get("isbn", NOT_SET),
+            ),
         )
         output_serializer = BookDetailOutputSerializer(updated_book)
 
@@ -107,9 +110,7 @@ class BookApi(APIView):
             return Response({"detail": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
         if book.owner != request.user:
-            return Response(
-                {"detail": "Нет прав для удаления этой книги"}, status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"detail": "Нет прав для удаления этой книги"}, status=status.HTTP_403_FORBIDDEN)
 
         BookService().book_delete(book)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -121,14 +122,17 @@ class ReadingListAddBookApi(APIView):
         request=ReadingListInputSerializer,
         responses=ReadingListOutputSerializer,
     )
-    def post(self, request: Request,) -> Response:
+    def post(
+        self,
+        request: Request,
+    ) -> Response:
         serializer = ReadingListInputSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         updated_book = BookService().reading_list_add(
             user=request.user,
             book=serializer.validated_data["book"],
-            list_type=serializer.validated_data["list_type"]
+            list_type=serializer.validated_data["list_type"],
         )
         output_serializer = ReadingListOutputSerializer(updated_book)
 

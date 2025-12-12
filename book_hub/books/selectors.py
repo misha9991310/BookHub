@@ -1,6 +1,6 @@
-from django.db.models import QuerySet, Prefetch
+from django.db.models import Prefetch, QuerySet
 
-from book_hub.books.models import Book, ReadingList, Genre
+from book_hub.books.models import Book, Genre, ReadingList
 from book_hub.users.models import User
 
 
@@ -32,12 +32,7 @@ class BookSelector:
         return (
             ReadingList.objects.filter(user=user)
             .select_related("book", "user")
-            .prefetch_related(Prefetch(
-                "book__genres",
-                queryset=genres_only,
-                to_attr="genres_only"
-                )
-            )
+            .prefetch_related(Prefetch("book__genres", queryset=genres_only, to_attr="genres_only"))
         )
 
     # .only("user__username", "user__avatar")

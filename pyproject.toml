@@ -29,7 +29,7 @@ pytest = "^9.0.1"
 ruff = "^0.14.5"
 
 [tool.ruff]
-line-length = 100
+line-length = 120
 exclude = [
     ".git",
     ".ruff_cache",
