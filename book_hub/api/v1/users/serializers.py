@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from book_hub.books.models import Genre
 from book_hub.users.models import User
@@ -8,6 +9,33 @@ class GenreOutputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ("title",)
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=128, min_length=8, write_only=True)
+    token = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "bio", "avatarfavorite_genrespassword"]
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    favorite_genres = GenreOutputSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "username",
+            "email",
+            "bio",
+            "avatar",
+            "favorite_genres",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "email", "created_at", "updated_at")
 
 
 class UserMinimalOutputSerializer(serializers.ModelSerializer):
@@ -24,21 +52,11 @@ class UserMinimalOutputSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class UserDetailOutputSerializer(serializers.ModelSerializer):
-    favorite_genres = GenreOutputSerializer(many=True, read_only=True)
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
 
-    class Meta:
-        model = User
-        fields = [
-            "id",
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "avatar",
-            "favorite_genres",
-            "date_joined",
-            "created_at",
-        ]
-        read_only_fields = fields
+        serializer = UserProfileSerializer(self.user)
+        data["user"] = serializer.data
+
+        return data

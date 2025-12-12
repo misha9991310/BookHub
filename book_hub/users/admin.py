@@ -13,7 +13,8 @@ class ReadingListInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(DefaultUserAdmin):
+class BaseUserAdmin(admin.ModelAdmin):
+    list_display = ("email", "is_staff", "is_superuser", "is_active", "created_at", "updated_at")
     fieldsets = DefaultUserAdmin.fieldsets + (
         (None, {"fields": ("bio", "avatar", "favorite_genres")}),
     )
@@ -21,8 +22,6 @@ class UserAdmin(DefaultUserAdmin):
     list_display = (
         "username",
         "email",
-        "first_name",
-        "last_name",
         "is_staff",
         "bio",
         "avatar",

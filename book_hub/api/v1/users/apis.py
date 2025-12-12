@@ -1,64 +1,101 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from book_hub.api.v1.books.serializers import (
     BookListOutputSerializer,
     ReadingListOutputSerializer,
 )
+from book_hub.api.v1.users.serializers import (
+    CustomTokenObtainPairSerializer,
+    RegistrationSerializer,
+    UserProfileSerializer,
+)
 from book_hub.books.selectors import BookSelector
+from book_hub.users.entities import CreateUser
+from book_hub.users.services import UserService
 
 
-class UserRegisterApi(APIView):
+class UserRegistrationAPI(APIView):
+    permission_classes = (AllowAny,)
+    serializer_class = RegistrationSerializer
 
     @extend_schema(
         summary="Регистрация пользователя",
-        responses=BookListOutputSerializer(many=True),
+        request=RegistrationSerializer,
+        responses=UserProfileSerializer(many=True),
     )
-    def get(self, request: Request) -> Response:
-        books = BookSelector.reading_lists_by_user(
-            user=request.user
+    def post(self, request: Request) -> Response:
+        serializer = RegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = UserService().user_create(
+            create_data=CreateUser(
+                username=serializer.validated_data["username"],
+                email=serializer.validated_data["email"],
+                bio=serializer.validated_data["bio"],
+                avatar=serializer.validated_data["avatar"],
+                favorite_genres=serializer.validated_data["favorite_genres"],
+                password=serializer.validated_data["password"],
+            )
         )
-        serializer = ReadingListOutputSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class UserProfileApi(APIView):
-
-    @extend_schema(
-        summary="Получить профиль пользователя",
-        responses=BookListOutputSerializer(many=True),
-    )
-    def get(self, request: Request) -> Response:
-        books = BookSelector.reading_lists_by_user(
-            user=request.user
+        refresh = RefreshToken.for_user(user)
+        user_serializer = UserProfileSerializer(user)
+        return Response(
+            {
+                "user": user_serializer,
+                "tokens": {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                },
+            },
+            status=status.HTTP_201_CREATED,
         )
-        serializer = ReadingListOutputSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        summary="Получить профиль пользователя",
-        responses=BookListOutputSerializer(many=True),
-    )
-    def patch(self, request: Request) -> Response:
-        books = BookSelector.reading_lists_by_user(
-            user=request.user
-        )
-        serializer = ReadingListOutputSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        try:
+            refresh_token = request.data.get("refresh")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"message": "Успешный выход из системы"}, status=status.HTTP_205_RESET_CONTENT
+            )
+        except TokenError:
+            return Response({"error": "Неверный токен"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    permission_classes = [AllowAny]
 
 
 class UserListBookApi(APIView):
-
     @extend_schema(
-        summary="Получение списка всех книг пользователя",
+        summary="Получить список чтения пользователя",
         responses=BookListOutputSerializer(many=True),
     )
     def get(self, request: Request) -> Response:
-        books = BookSelector.reading_lists_by_user(
-            user=request.user
-        )
+        books = BookSelector.reading_lists_by_user(user=request.user)
         serializer = ReadingListOutputSerializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserProfileView(APIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

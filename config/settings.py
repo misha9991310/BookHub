@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +52,8 @@ THIRD_PARTY_APPS = [
     # 'storages',
     "rest_framework",
     "drf_spectacular",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 INSTALLED_APPS = [
@@ -168,7 +171,16 @@ AUTH_USER_MODEL = "users.User"
 
 REST_FRAMEWORK: dict[str, Any] = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": "rest_framework_simplejwt.authentication.JWTAuthentication",
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
+
 SPECTACULAR_SETTINGS = {
     "TITLE": "BOOK HUB",
     "DESCRIPTION": "pet-project",
