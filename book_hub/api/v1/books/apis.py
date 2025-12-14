@@ -4,6 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from book_hub.api.permission import IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly
 from book_hub.api.v1.books.serializers import (
     BookDetailOutputSerializer,
     BookInputSerializer,
@@ -18,6 +19,8 @@ from book_hub.books.services import BookService
 
 
 class BookListAndCreateApi(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
     @extend_schema(
         summary="Создание новой книги",
         request=BookInputSerializer,
@@ -55,6 +58,8 @@ class BookListAndCreateApi(APIView):
 
 
 class BookApi(APIView):
+    permission_classes = [IsOwnerOrReadOnly]
+
     @extend_schema(
         summary="Получение полной информации книги",
         responses=BookDetailOutputSerializer,
@@ -76,12 +81,6 @@ class BookApi(APIView):
         book = BookSelector.book_detail(book_pk=book_pk)
         if not book:
             return Response({"detail": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND)
-
-        if book.owner != request.user:  # в пермишн
-            return Response(
-                {"detail": "Нет прав для редактирования этой книги"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
 
         serializer = UpdateBookInputSerializer(data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -109,14 +108,13 @@ class BookApi(APIView):
         if not book:
             return Response({"detail": "Книга не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
-        if book.owner != request.user:
-            return Response({"detail": "Нет прав для удаления этой книги"}, status=status.HTTP_403_FORBIDDEN)
-
         BookService().book_delete(book)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ReadingListAddBookApi(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
     @extend_schema(
         summary="Добавление книги в список для чтения",
         request=ReadingListInputSerializer,

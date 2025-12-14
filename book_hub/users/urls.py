@@ -1,9 +1,9 @@
-from django.contrib.auth.views import LogoutView
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from book_hub.api.v1.users.apis import (
     CustomTokenObtainPairView,
+    LogoutView,
     UserListBookApi,
     UserProfileView,
     UserRegistrationAPI,

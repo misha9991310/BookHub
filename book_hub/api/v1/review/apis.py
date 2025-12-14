@@ -4,6 +4,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from book_hub.api.permission import IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly
 from book_hub.api.v1.review.serializers import (
     ReviewInputSerializer,
     ReviewOutputSerializer,
@@ -15,6 +16,8 @@ from book_hub.reviews.services import ReviewsService
 
 
 class ReviewCreateApi(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
     @extend_schema(
         summary="Создание отзыва",
         request=ReviewInputSerializer,
@@ -38,6 +41,8 @@ class ReviewCreateApi(APIView):
 
 
 class ReviewApi(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
     @extend_schema(
         summary="Получение списка всех отзывов для книги",
         responses=ReviewWithUserWithBookOutputSerializer(many=True),

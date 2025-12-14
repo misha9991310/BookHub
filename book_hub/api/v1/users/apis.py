@@ -8,6 +8,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from book_hub.api.permission import IsOwnerOrReadOnly
 from book_hub.api.v1.books.serializers import (
     BookListOutputSerializer,
     ReadingListOutputSerializer,
@@ -18,9 +19,8 @@ from book_hub.api.v1.users.serializers import (
     UserProfileOutputSerializer,
 )
 from book_hub.books.selectors import BookSelector
-from book_hub.users.entities import CreateUser
+from book_hub.users.models import User
 from book_hub.users.selectors import UserSelector
-from book_hub.users.services import UserService
 
 
 class UserRegistrationAPI(APIView):
@@ -30,27 +30,22 @@ class UserRegistrationAPI(APIView):
     @extend_schema(
         summary="Регистрация пользователя",
         request=RegistrationSerializer,
-        responses=UserProfileOutputSerializer(many=True),
+        responses=UserProfileOutputSerializer,
     )
     def post(self, request: Request) -> Response:
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = UserService().user_create(
-            create_data=CreateUser(
-                username=serializer.validated_data["username"],
-                email=serializer.validated_data["email"],
-                bio=serializer.validated_data["bio"],
-                avatar=serializer.validated_data["avatar"],
-                favorite_genres=serializer.validated_data["favorite_genres"],
-                password=serializer.validated_data["password"],
-            )
+        user = User.objects.create_user(
+            username=serializer.validated_data["username"],
+            email=serializer.validated_data["email"],
+            password=serializer.validated_data["password"],
         )
         refresh = RefreshToken.for_user(user)
         user_serializer = UserProfileOutputSerializer(user)
         return Response(
             {
-                "user": user_serializer,
+                "user": user_serializer.data,
                 "tokens": {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
@@ -63,6 +58,9 @@ class UserRegistrationAPI(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Выход из аккаунта",
+    )
     def post(self, request: Request) -> Response:
         try:
             refresh_token = request.data.get("refresh")
@@ -80,6 +78,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 class UserListBookApi(APIView):
+    serializer_class = ReadingListOutputSerializer
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+
     @extend_schema(
         summary="Получить список чтения пользователя",
         responses=BookListOutputSerializer(many=True),
@@ -99,6 +100,6 @@ class UserProfileView(APIView):
         responses=UserProfileOutputSerializer(many=True),
     )
     def get(self, request: Request) -> Response:
-        user = UserSelector.user_by_id(user=request.user)
+        user = UserSelector.user_by_id(user_id=request.user.id)
         serializer = UserProfileOutputSerializer(user, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
