@@ -16,7 +16,6 @@ class BaseUserAdmin(admin.ModelAdmin):
     fields = [
         "username",
         "email",
-        "password",
         "bio",
         "avatar",
         "favorite_genres",

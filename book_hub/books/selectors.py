@@ -6,7 +6,7 @@ from book_hub.users.models import User
 
 class BookSelector:
     @staticmethod
-    def book_list() -> QuerySet[Book]:
+    def book_list() -> QuerySet[Book]: # приведем названия методов к каноническому
         return Book.objects.all()
 
     @staticmethod

@@ -31,28 +31,24 @@ class BaseUserManager(BUM):
 
         return user
 
-    def create_superuser(self, email, username, password=None):
-        user = self.create_user(
+    def create_superuser(self, email, username, password=None): # аннотация
+        return self.create_user(
             email=email,
             username=username,
             is_active=True,
             is_admin=True,
             password=password,
+            is_superuser=True,
         )
-
-        user.is_superuser = True
-        user.save(using=self._db)
-
-        return user
 
 
 class User(BaseModel, AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    username = models.CharField(db_index=True, max_length=255, unique=True)
+    username = models.CharField(db_index=True, max_length=255, unique=True) # здесь индекс не нужен
     email = models.EmailField(db_index=True, unique=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    bio = models.TextField(verbose_name="Биография", default="", blank=True)
+    bio = models.TextField(verbose_name="Биография", null=True, blank=True)
     avatar = models.ImageField(upload_to="avatars/%Y/%m/%d/", null=True, blank=True, verbose_name="Аватар")
     favorite_genres = models.ManyToManyField(Genre, related_name="users", blank=True, verbose_name="Любимые жанры")
 
@@ -67,4 +63,4 @@ class User(BaseModel, AbstractBaseUser, PermissionsMixin):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return self.username
+        return f"{self.username} <{self.email}>"

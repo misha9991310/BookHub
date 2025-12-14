@@ -30,12 +30,13 @@ class UserRegistrationAPI(APIView):
     @extend_schema(
         summary="Регистрация пользователя",
         request=RegistrationSerializer,
-        responses=UserProfileOutputSerializer,
+        responses=UserProfileOutputSerializer,  # другой сериалайзер - не совпадает с респонсом
     )
     def post(self, request: Request) -> Response:
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        # обработать ошибки, чтобы не было 500
         user = User.objects.create_user(
             username=serializer.validated_data["username"],
             email=serializer.validated_data["email"],

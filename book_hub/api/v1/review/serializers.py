@@ -5,7 +5,7 @@ from book_hub.api.v1.users.serializers import UserMinimalOutputSerializer
 from book_hub.reviews.models import Review, ReviewLike
 
 
-class ReviewWithUserWithBookOutputSerializer(serializers.ModelSerializer):
+class ReviewWithUserWithBookOutputSerializer(serializers.ModelSerializer): # ReviewOutputSerializer
     user = UserMinimalOutputSerializer(read_only=True)
     book = BookListOutputSerializer(read_only=True)
     likes_count = serializers.SerializerMethodField()

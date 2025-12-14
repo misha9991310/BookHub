@@ -14,9 +14,11 @@ class GenreOutputSerializer(serializers.ModelSerializer):
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True)
 
+    # валидация для пароля (буквы+цифры+спец символ)
+
     class Meta:
         model = User
-        fields = ["username", "email", "password"]
+        fields = ("username", "email", "password")
 
 
 class UserProfileOutputSerializer(serializers.ModelSerializer):

@@ -15,7 +15,6 @@ class BookService:
 
     @transaction.atomic
     def book_create(self, owner: User, create_data: CreateBook) -> Book:
-        genres_ids = create_data.genres
         book = Book.objects.create(
             owner=owner,
             title=create_data.title,
@@ -27,7 +26,7 @@ class BookService:
             isbn=create_data.isbn,
         )
 
-        self._set_genres(book=book, genres_ids=genres_ids)
+        self._set_genres(book=book, genres_ids=create_data.genres)
 
         return book
 
@@ -35,7 +34,7 @@ class BookService:
     def book_update(self, book: Book, update_data: UpdateBook) -> Book:
         update_fields = []
 
-        for field_name in [
+        for field_name in [ # что-нибудь придумать здесь
             "title",
             "author",
             "description",
@@ -57,8 +56,8 @@ class BookService:
 
         return book
 
-    def book_delete(self, book: Book):
+    def book_delete(self, book: Book) -> None:
         book.delete()
 
     def reading_list_add(self, user: User, book: Book, list_type: str) -> ReadingList:
-        return ReadingList.objects.get_or_create(user=user, book=book, defaults={"list_type": list_type})[0]
+        return ReadingList.objects.get_or_create(user=user, book=book, defaults={"list_type": list_type})[0] # возможно стоит ошибку обработать и вернуть None

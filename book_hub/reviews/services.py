@@ -11,6 +11,7 @@ from book_hub.users.models import User
 class ReviewsService:
     @transaction.atomic
     def review_create(self, owner: User, create_data: CreateReview) -> Review:
+        # обработать integrity error для unique together
         return Review.objects.create(
             book=create_data.book,
             user=owner,

@@ -27,7 +27,7 @@ class ReviewCreateApi(APIView):
         serializer = ReviewInputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        review = ReviewsService().review_create(
+        review = ReviewsService().review_create( # обрабатываем ошибку
             owner=request.user,
             create_data=CreateReview(
                 book=serializer.validated_data["book"],
